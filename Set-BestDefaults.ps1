@@ -23,11 +23,11 @@
 function Set-BestDefaults 
 {
     [CmdletBinding(DefaultParameterSetName='Parameter Set 1', 
-                  SupportsShouldProcess=$true, 
+                  SupportsShouldProcess=$false, 
                   PositionalBinding=$false,
                   HelpUri = 'http://www.microsoft.com/',
                   ConfirmImpact='Medium')]
-    [Alias(sbd)]
+    [Alias('sbd')]
     [OutputType([String])]
     Param
     (
@@ -38,7 +38,7 @@ function Set-BestDefaults
                    ValueFromRemainingArguments=$false, 
                    Position=0,
                    ParameterSetName='Parameter Set 1')]
-        [Alias("PHP")] 
+        [Alias('PHP')] 
         $PwshHomePath = $env:HOMEPATH
     )
 
@@ -49,11 +49,19 @@ function Set-BestDefaults
         ########################
 
         #Check to see if "PowerShell Profile" is already created (True/False) Value
-        $PowerShellProfile = Test-path $profile
+        $PowerShellProfile = (Test-path $profile)
         #Check to see if "DailyLog" folder is created under PowerShell Profile is already created (True/False) Value
-        $DailyLogFolder = Test-Path $profile.TrimEnd('Microsoft.PowerShellISE_profile.ps1') + "DailyLog"
+        $DailyLogFolder = (Test-Path ($profile.TrimEnd('Microsoft.PowerShellISE_profile.ps1') + 'DailyLog'))
         #Create daily log name to be used with setting up Powershell transcripting
         $DailyLogName = "PowerShellDailyTranscript_" + "$(Get-Date -UFormat %Y-%m-%d)" + ".log"
+
+        ############################
+        # Display Script Variables #
+        ############################
+
+        Write-Verbose "PowerShellProfile Value equals $($PowerShellProfile)"
+        Write-Verbose "DailyLogFolder Value equals $($DailyLogFolder)"
+        Write-Verbose "DailyLogName Value equals $($DailyLogName)"
         
     }
     Process
@@ -66,11 +74,34 @@ function Set-BestDefaults
 
             #Creates PowerShell Profile if it does not already exist
             if ($PowerShellProfile -ne $true) {
-                New-item -path $profile -type file -force
+                Write-Verbose "Attempting to create PowerShell profile for User: $($env:USERNAME)"
+                New-item -path $profile -ItemType File -Force
+                
+                #Creates DailyLog folder if it does not already exist
+                if ($DailyLogFolder -ne $true) {
+                    Write-Verbose "Attempting to create DailyLog folder for User: $($env:USERNAME)"
+                    New-Item -Path ($profile.TrimEnd('Microsoft.PowerShellISE_profile.ps1') + 'DailyLog') -ItemType Directory -Force
+
+                    #Enabled Transcripting within user PowerShell Profile if it does not already exist
+                    Write-Verbose "Attempting to enable Transcripting for User: $($env:USERNAME)"
+                    if ((Get-Content $profile) -ne "Start-Transcript -Path $($profile.TrimEnd('Microsoft.PowerShellISE_profile.ps1') + 'DailyLog\' + $DailyLogName + ' -Append -IncludeInvocationHeader')") 
+                    {
+                        Write-Verbose "Attempting to add transcript command to $($profile)"
+                        Add-Content -Path $profile-Value "Start-Transcript -Path $($profile.TrimEnd('Microsoft.PowerShellISE_profile.ps1') + 'DailyLog\' + $DailyLogName + ' -Append -IncludeInvocationHeader')"
+                    }
+                }
             } 
         }
     }
     End
     {
+        Write-Verbose "PowerShell Profile Enabled: $(Test-Path ($profile))"
+        Write-Verbose "Created DailyLog Folder: $(Test-Path ($profile.TrimEnd('Microsoft.PowerShellISE_profile.ps1') + 'DailyLog'))"
+        Write-Verbose "PowerShell Transcript Enabled: $((Get-Content $profile) -eq "Start-Transcript -Path $($profile.TrimEnd('Microsoft.PowerShellISE_profile.ps1') + 'DailyLog\' + $DailyLogName + ' -Append -IncludeInvocationHeader')")"
     }
 }
+
+##############
+# Run Script #
+##############
+Set-BestDefaults -Verbose
