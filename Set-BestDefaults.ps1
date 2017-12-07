@@ -3,7 +3,7 @@ SupportsShouldProcess=$false,
 PositionalBinding=$false,
 HelpUri = 'https://technet.microsoft.com/en-us/library/bb613488(v=vs.85).aspx and https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.host/start-transcript?view=powershell-5.1',
 ConfirmImpact='Medium')]
-[Alias('sbd')]
+[Alias('SBD')]
 [OutputType([String])]
 Param
 (
@@ -18,7 +18,6 @@ Param
     $PwshHomePath = $env:HOMEPATH
 )
 
-
 <#
 .Synopsis
    Setup PowerShell Profile for current user and enalbe "Start-Transcript" as defaulf for powershell console.
@@ -26,7 +25,6 @@ Param
    Meant to be an example script for people new to PowerShell will setup PowerShell Profiles and Enable "Start-Trnscript". Also to be used as an example script to help teach novice script some baisc best practices and scripting. If you notice some best practices messsing within the script, please fill free to updated.
 .EXAMPLE
    Set-BestDefaults
-
 .NOTES
    This is a communety project, fill free to make it even better.
 .COMPONENT
