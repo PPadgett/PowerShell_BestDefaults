@@ -5,4 +5,4 @@ Script currently setup PowerShell Profile while enable Transcript. I have found 
 
 Please feel free to contribute.
 
-Notes:  Main script works, now its time for some Pester my script.
+Notes:  Main script works, now its time to Pester my script.
